@@ -166,7 +166,7 @@ class Auth0:
             unverified_header = jwt.get_unverified_header(token)
             rsa_key = {}
             for key in self.jwks['keys']:
-                if key['kid'] == unverified_header['kid']:
+                if key['kid'] == unverified_header.get('kid'):
                     rsa_key = {
                         'kty': key['kty'],
                         'kid': key['kid'],
