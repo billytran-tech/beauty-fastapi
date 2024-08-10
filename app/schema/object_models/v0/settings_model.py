@@ -1,14 +1,11 @@
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 
 
 class NotificationAvenues(BaseModel):
     sms: bool = Field(...)
     email: bool = Field(...)
     whatsapp: bool = Field(...)
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
 
 
 class NotificationSettings(BaseModel):
@@ -16,15 +13,9 @@ class NotificationSettings(BaseModel):
     BookingReminders: NotificationAvenues
     SuavUpdates: NotificationAvenues
     SecuritySettings: NotificationAvenues
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
 
 
-class Settings(BaseModel):
+class ProfileSettings(BaseModel):
     notification_preferences: NotificationSettings
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)

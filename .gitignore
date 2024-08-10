@@ -160,3 +160,9 @@ cython_debug/
 #.idea/
 .DS_Store
 # *.py
+
+# SCRIPTS
+scripts/
+.env.test
+example-test.env
+example.env
