@@ -166,3 +166,5 @@ scripts/
 .env.test
 example-test.env
 example.env
+
+tests
