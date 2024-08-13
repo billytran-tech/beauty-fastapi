@@ -167,4 +167,7 @@ scripts/
 example-test.env
 example.env
 
-tests
+# tests
+app/routers/v0/bookings.py
+app/routers/v0/uploads.py
+/app/services
