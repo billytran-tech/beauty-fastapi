@@ -1,5 +1,4 @@
 import asyncio
-from tests.data.data_setup import merchants
 import requests
 from pydantic_settings import SettingsConfigDict, BaseSettings
 from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorClient
