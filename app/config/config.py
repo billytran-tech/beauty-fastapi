@@ -8,6 +8,10 @@ class Settings(BaseSettings):
 
     AUTH0_DOMAIN: str
     AUTH0_API_AUDIENCE: str
+
+    AZURE_STORAGE_CONNECTION_STRING: str
+    IMAGE_CONTAINER_NAME: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
 
