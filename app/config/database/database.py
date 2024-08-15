@@ -3,13 +3,8 @@ import certifi
 from pymongo.server_api import ServerApi
 from app.config.config import settings
 
-# Global variables for MongoDB client and collections
-client = None
-database = None
-collections = {}
 
-
-def create_index(collection, field, unique=False, sparse=False):
+def create_collection_index(collection, field, unique=False, sparse=False):
     """
     Create an index for a MongoDB collection.
 
@@ -22,39 +17,54 @@ def create_index(collection, field, unique=False, sparse=False):
     collection.create_index(field, unique=unique, sparse=sparse)
 
 
-def connect_to_database():
-    global client, database, collections
+def initiate_collections(db):
+    collections = {
+        "usernames": db["usernames"],
+        "merchants": db["merchants"],
+        "customers": db["customers"],
+        "services": db["services"],
+        "bookings": db["bookings"],
+        "transactions": db["transactions"],
+    }
+    create_collection_index(collections["usernames"], "username", unique=True)
+    create_collection_index(collections["merchants"], [
+        ("username_id", 1)], unique=True, sparse=True)
+    create_collection_index(collections["merchants"], [
+                            ("user_id", 1)], unique=True)
+    create_collection_index(collections["merchants"],
+                            "profiles.username", unique=True, sparse=True)
+    create_collection_index(collections["customers"], [
+                            ("user_id", 1)], unique=True)
+    create_collection_index(collections["bookings"], "merchant_id")
+    create_collection_index(collections["bookings"], "customer_id")
+    create_collection_index(collections["transactions"], "booking_id")
 
+
+def connect_db_client(db_url: str = settings.DB_URL):
     ca = certifi.where()
-    db_url = settings.DB_URL
-    db_name = settings.DB_NAME
-
     client = motor.motor_asyncio.AsyncIOMotorClient(
         db_url, tlsCAFile=ca, server_api=ServerApi('1'))
+    return client
+
+
+def connect_to_database(db_name: str = settings.DB_NAME):
+    client = connect_db_client()
     database = client[db_name]
-
-    # Initialize collections
-    collections = {
-        "usernames": database["usernames"],
-        "merchants": database["merchants"],
-        "customers": database["customers"],
-        "services": database["services"],
-        "bookings": database["bookings"],
-        "transactions": database["transactions"],
-    }
-
-    # Create indexes
-    create_index(collections["usernames"], "username", unique=True)
-    create_index(collections["merchants"], [
-                 ("username_id", 1)], unique=True, sparse=True)
-    create_index(collections["merchants"], [("auth0id", 1)], unique=True)
-    create_index(collections["merchants"],
-                 "profiles.username", unique=True, sparse=True)
-    create_index(collections["customers"], [("auth0id", 1)], unique=True)
-    create_index(collections["bookings"], "merchant_id")
-    create_index(collections["bookings"], "customer_id")
-    create_index(collections["transactions"], "booking_id")
+    initiate_collections(database)
+    return database
 
 
-def close_database_connection():
-    client.close()
+client = connect_db_client()
+db = connect_to_database()
+
+
+def get_db():
+    return db
+
+
+def get_db_client():
+    return client
+
+
+def get_db_name():
+    return settings.DB_NAME

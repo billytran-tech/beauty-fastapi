@@ -1,5 +1,7 @@
 from fastapi import FastAPI, status
 from pydantic import BaseModel
+from app.routers.v0 import customer, merchant, services
+
 
 app = FastAPI(
     title="Suav Beauty Technologies Inc. API for Web Application",
@@ -8,9 +10,12 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
+app.include_router(customer.router)
+app.include_router(merchant.router)
+app.include_router(services.router)
+
 
 class WelcomeResponse(BaseModel):
-    # A Pydantic model for the response of the root endpoint
     msg: str
 
 

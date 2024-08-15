@@ -1,5 +1,5 @@
 from pydantic import EmailStr
-from pydantic_settings import BaseSettings
+from pydantic_settings import SettingsConfigDict, BaseSettings
 
 
 class Settings(BaseSettings):
@@ -8,9 +8,7 @@ class Settings(BaseSettings):
 
     AUTH0_DOMAIN: str
     AUTH0_API_AUDIENCE: str
-
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(env_file=".env")
 
 
 settings = Settings()
