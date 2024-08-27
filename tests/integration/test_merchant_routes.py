@@ -161,7 +161,6 @@ async def test_create_merchant_profile(client: AsyncClient, get_token: str, clea
         },
         "profile_image_url": None,
         "schedule": {
-            "preffered_timezone": "",
             "daily_schedule": {
                 "monday": {
                     "is_available": False,
@@ -305,7 +304,6 @@ async def test_get_existing_merchant_profile(client: AsyncClient, get_token: str
         },
         "profile_image_url": None,
         "schedule": {
-            "preffered_timezone": "",
             "daily_schedule": {
                 "monday": {
                     "is_available": False,
@@ -534,7 +532,6 @@ async def test_update_merchant_profile(client: AsyncClient, get_token: str, clea
         },
         "profile_image_url": None,
         "schedule": {
-            "preffered_timezone": "",
             "daily_schedule": {
                 "monday": {
                     "is_available": False,
@@ -685,7 +682,6 @@ async def test_update_merchant_basic_info(client: AsyncClient, get_token: str, c
         },
         "profile_image_url": None,
         "schedule": {
-            "preffered_timezone": "",
             "daily_schedule": {
                 "monday": {
                     "is_available": False,
@@ -845,7 +841,6 @@ async def test_update_merchant_location_only(client: AsyncClient, get_token: str
         },
         "profile_image_url": None,
         "schedule": {
-            "preffered_timezone": "",
             "daily_schedule": {
                 "monday": {
                     "is_available": False,
@@ -1089,9 +1084,195 @@ async def test_delete_merchant_profile_also_deletes_username_record(client: Asyn
     assert response.status_code == 404
     assert response.json() == {
         'detail': 'Merchant profile does not exist. Please create one.'}
+# TEST UPDATE SCHEDULE
+
+
+def get_example_schedule():
+    return {
+        "daily_schedule": {
+            "monday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "10:00:00Z",
+                    "end_time": "18:00:00Z"
+                },
+                "blocked_hours": [
+                    {
+                        "start_time": "14:00:00Z",
+                        "end_time": "15:00:00Z"
+                    }
+                ]
+            },
+            "tuesday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "10:00:00Z",
+                    "end_time": "18:00:00Z"
+                },
+                "blocked_hours": [
+                    {
+                        "start_time": "14:00:00Z",
+                        "end_time": "15:00:00Z"
+                    }
+                ]
+            },
+            "wednesday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "10:00:00Z",
+                    "end_time": "18:00:00Z"
+                },
+                "blocked_hours": []
+            },
+            "thursday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "10:00:00Z",
+                    "end_time": "18:00:00Z"
+                },
+                "blocked_hours": []
+            },
+            "friday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "10:00:00Z",
+                    "end_time": "18:00:00Z"
+                },
+                "blocked_hours": []
+            },
+            "saturday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "11:00:00Z",
+                    "end_time": "16:00:00Z"
+                },
+                "blocked_hours": []
+            },
+            "sunday": {
+                "is_available": False,
+                "operating_hours": {
+                    "start_time": None,
+                    "end_time": None
+                },
+                "blocked_hours": []
+            }
+        },
+        "blocked_dates": [
+            "2024-12-25",
+            "2025-01-01"
+        ]
+    }
+
+
+@pytest.mark.anyio
+async def test_update_availability(client: AsyncClient, get_token: str, clean_profile_state):
+    headers = {'Authorization': f'Bearer {get_token}'}
+    # SETUP
+    setup_response = await client.post(url='/api/merchant/create', headers=headers, json={
+        "username": "suavbarber898",
+        "name": "Tshiamo's Barbershop",
+        "profession": "Barber",
+        "location": {
+            "coordinates": {
+                "longitude": -79.88573989999999,
+                "latitude": 43.5111844
+            },
+            "country": {
+                "name": "South Africa",
+                "code": "ZA",
+                "currency": {
+                    "code": "ZAR",
+                    "symbol": "R",
+                    "name": "South African Rand"
+                }
+            },
+            "city": "Milton",
+            "street_address": "123 Main St E, Milton, ON L9T 1N4, Canada"
+        },
+        "bio": "Discover the art of grooming at BarberShop XYZ in Toronto, Canada. Our skilled barbers deliver precision haircuts, expert shaves, and a relaxing experience. Book today and elevate your style."
+    })
+    assert setup_response.status_code == 201
+
+    response = await client.put('/api/merchant/update/availability', headers=headers, json=get_example_schedule())
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "daily_schedule": {
+            "monday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "10:00:00Z",
+                    "end_time": "18:00:00Z"
+                },
+                "blocked_hours": [
+                    {
+                        "start_time": "14:00:00Z",
+                        "end_time": "15:00:00Z"
+                    }
+                ]
+            },
+            "tuesday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "10:00:00Z",
+                    "end_time": "18:00:00Z"
+                },
+                "blocked_hours": [
+                    {
+                        "start_time": "14:00:00Z",
+                        "end_time": "15:00:00Z"
+                    }
+                ]
+            },
+            "wednesday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "10:00:00Z",
+                    "end_time": "18:00:00Z"
+                },
+                "blocked_hours": []
+            },
+            "thursday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "10:00:00Z",
+                    "end_time": "18:00:00Z"
+                },
+                "blocked_hours": []
+            },
+            "friday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "10:00:00Z",
+                    "end_time": "18:00:00Z"
+                },
+                "blocked_hours": []
+            },
+            "saturday": {
+                "is_available": True,
+                "operating_hours": {
+                    "start_time": "11:00:00Z",
+                    "end_time": "16:00:00Z"
+                },
+                "blocked_hours": []
+            },
+            "sunday": {
+                "is_available": False,
+                "operating_hours": {
+                    "start_time": None,
+                    "end_time": None
+                },
+                "blocked_hours": []
+            }
+        },
+        "blocked_dates": [
+            "2024-12-25",
+            "2025-01-01"
+        ]
+    }
+
+
 # TEST DELETE MERCHANT PROFILE WITH NO PROFILE
-
-
 @pytest.mark.anyio
 async def test_delete_merchant_profile_with_no_profile_shows_not_found(client: AsyncClient, get_token: str, clean_profile_state):
     headers = {'Authorization': f'Bearer {get_token}'}

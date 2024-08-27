@@ -31,7 +31,6 @@ class DailySchedule(BaseModel):
 
 
 class Schedule(BaseModel):
-    preffered_timezone: str
     daily_schedule: DailySchedule
     blocked_dates: List[date]
     model_config = ConfigDict(populate_by_name=True,

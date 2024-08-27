@@ -1,4 +1,5 @@
 import logging
+from datetime import time
 from fastapi import APIRouter, status, Depends, HTTPException, Security
 from fastapi.encoders import jsonable_encoder
 from pydantic import ConfigDict, BaseModel, Field
@@ -296,6 +297,76 @@ async def update_merchant_location_info(payload: user_model.Location, user_profi
 
     except Exception as e:
         raise e
+
+
+def validate_schedule(schedule: user_model.Schedule):
+    def is_time_after(time1: time, time2: time) -> bool:
+        """Check if time1 is after time2."""
+        return time1 is not None and time2 is not None and time1 > time2
+
+    def is_time_within(time: time, start: time, end: time) -> bool:
+        """Check if time t is within the start and end time."""
+        return start <= time <= end
+
+    for day, daily_schedule in schedule.daily_schedule.model_dump().items():
+        # print(day)
+        operating_hours = daily_schedule.get('operating_hours')
+        blocked_hours = daily_schedule.get('blocked_hours')
+
+        # Validate operating hours
+        if operating_hours.get('start_time') and operating_hours.get('end_time'):
+            if is_time_after(operating_hours.get('start_time'), operating_hours.get('end_time')):
+                raise ValueError(
+                    f"Invalid operating hours on \'{day}\': end_time must be after start_time.")
+
+        # Validate blocked hours
+        for block in blocked_hours:
+            if block.get('start_time') and block.get('end_time'):
+                if is_time_after(block.get('start_time'), block.get('end_time')):
+                    raise ValueError(
+                        f"Invalid blocked hours on \'{day}\': end_time must be after start_time.")
+
+                if not is_time_within(block.get('start_time'), operating_hours.get('start_time'), operating_hours.get('end_time')) or \
+                        not is_time_within(block.get('end_time'), operating_hours.get('start_time'), operating_hours.get('end_time')):
+                    raise ValueError(
+                        f"Blocked hours on \'{day}\' must fall within operating hours.")
+
+    return True
+
+
+@router.put('/update/availability')
+async def update_availability(payload: user_model.Schedule, user_profile: Auth0User = Security(auth.get_user), db: AsyncIOMotorDatabase = Depends(get_db)):
+    user_id = user_profile.id
+    try:
+        if validate_schedule(user_model.Schedule.model_validate(payload)):
+
+            merchant = await db['merchants'].find_one({'user_id': user_id})
+            if not merchant:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                    detail="Merchant profile does not exist. Please create one.")
+            payload = jsonable_encoder(payload)
+            updated_user = await db['merchants'].update_one({'user_id': user_id}, {"$set": {"schedule": payload}})
+
+        if updated_user.matched_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
+        if updated_user.modified_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_304_NOT_MODIFIED, detail="Profile data not updated")
+
+        if (merchant := await db['merchants'].find_one({'user_id': user_id})) is not None:
+            merchant = jsonable_encoder(merchant)
+            # print(user)
+            schedule = merchant.get('schedule')
+            return schedule
+
+    except ValueError as ve:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+
+    except HTTPException as http_exc:
+        raise http_exc
 
 
 @router.delete('/delete', status_code=status.HTTP_200_OK, dependencies=[Depends(auth.implicit_scheme)])
