@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 from pydantic import BaseModel
-from app.routers.v0 import customer, merchant, services
+from app.routers.v0 import customer, merchant, services,bookings
 
 
 app = FastAPI(
@@ -13,7 +13,7 @@ app = FastAPI(
 app.include_router(customer.router)
 app.include_router(merchant.router)
 app.include_router(services.router)
-
+app.include_router(bookings.router)
 
 class WelcomeResponse(BaseModel):
     msg: str

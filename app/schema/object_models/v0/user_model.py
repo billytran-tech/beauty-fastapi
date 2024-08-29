@@ -43,6 +43,13 @@ class Merchant(User):
     schedule: Schedule
 
 
+class MerchantModelForComparison(BaseModel):
+    id: str = Field(alias='_id')
+    user_id: str
+    model_config = ConfigDict(populate_by_name=True,
+                              arbitrary_types_allowed=True)
+
+
 class CreateCustomer(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias='_id')
     name: str
@@ -233,4 +240,5 @@ class MerchantBasicInfo(BaseModel):
     username: str
     profession: str
     bio: Optional[str] = None
-    model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
+    model_config = ConfigDict(populate_by_name=True,
+                              arbitrary_types_allowed=True)

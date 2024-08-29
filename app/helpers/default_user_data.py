@@ -143,3 +143,36 @@ def get_example_schedule_model():
         ),
         blocked_dates=[date(2024, 12, 25), date(2025, 1, 1)]
     )
+
+def get_example_booking():
+    return {
+        "_id": "64f1a2b9c23eaa0001a55c8b",
+        "customer_id": "customer123",
+        "merchant_id": "merchant456",
+        "service_id": "service789",
+        "date_created": "2024-08-28T10:30:00+00:00",
+        "booking_status": "CONFIRMED",
+        "appointment_date": {
+            "start_time": "2024-08-29T15:30:00+00:00",
+            "end_time": "2024-08-29T17:00:00+00:00"
+        },
+        "payment_status": "PAID",
+        "location": {
+            "coordinates": {
+                "latitude": 40.712776,
+                "longitude": -74.005974
+
+            },
+            "country" : {
+                "name": "Canada",
+                "code": "CA",
+                "currency": {
+                    "code": "CAD",
+                    "symbol": "CA$",
+                    "name": "Canadian Dollar"
+                },
+            },
+            "city":"Cityville",
+            "street_address": "123 Main St, Cityville, CV12345",
+        },   
+    }
