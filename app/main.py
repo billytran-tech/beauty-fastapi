@@ -3,7 +3,8 @@ from typing import Optional
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
-from notification_service import NotificationService, NotificationType
+from app.notification_service import NotificationService, NotificationType
+from app.email_service import EmailService  # Import the EmailService
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,6 +17,7 @@ app = FastAPI(
 )
 
 notification_service = NotificationService()
+email_service = EmailService()
 
 class MessageRequest(BaseModel):
     booking_id: str
@@ -40,7 +42,15 @@ async def send_notification(request: MessageRequest):
                 sid = await notification_service.payment_update(request.booking_id, request.customer_id, request.to, request.update_text)
             else:
                 sid = await notification_service.new_booking(request.booking_id, request.customer_id, request.to)
-            return {"sid": sid, "message": "Notification sent successfully."}
+            return {"sid": sid, "message": "SMS notification sent successfully."}
+        
+        elif request.notification_type == NotificationType.EMAIL:
+            if request.update_text:
+                sid = await email_service.payment_update(request.booking_id, request.customer_id, request.to, request.update_text)
+            else:
+                sid = await email_service.new_booking(request.booking_id, request.customer_id, request.to)
+            return {"sid": sid, "message": "Email notification sent successfully."}
+
         else:
             return {"message": f"{request.notification_type} notifications are not implemented yet."}
     except Exception as e:
@@ -48,20 +58,56 @@ async def send_notification(request: MessageRequest):
 
 @app.post("/send-booking-reminder", status_code=status.HTTP_200_OK, response_model=MessageResponse)
 async def send_booking_reminder(request: MessageRequest):
-    sid = await notification_service.booking_reminder(request.booking_id, request.customer_id, request.to)
-    return {"sid": sid, "message": "Booking reminder sent successfully."}
+    try:
+        if request.notification_type == NotificationType.SMS:
+            sid = await notification_service.booking_reminder(request.booking_id, request.customer_id, request.to)
+            return {"sid": sid, "message": "SMS booking reminder sent successfully."}
+        elif request.notification_type == NotificationType.EMAIL:
+            sid = await email_service.booking_reminder(request.booking_id, request.customer_id, request.to)
+            return {"sid": sid, "message": "Email booking reminder sent successfully."}
+        else:
+            return {"message": f"{request.notification_type} notifications are not implemented yet."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/send-booking-rejected", status_code=status.HTTP_200_OK, response_model=MessageResponse)
 async def send_booking_rejected(request: MessageRequest):
-    sid = await notification_service.booking_rejected(request.booking_id, request.customer_id, request.to)
-    return {"sid": sid, "message": "Booking rejection sent successfully."}
+    try:
+        if request.notification_type == NotificationType.SMS:
+            sid = await notification_service.booking_rejected(request.booking_id, request.customer_id, request.to)
+            return {"sid": sid, "message": "SMS booking rejection sent successfully."}
+        elif request.notification_type == NotificationType.EMAIL:
+            sid = await email_service.booking_rejected(request.booking_id, request.customer_id, request.to)
+            return {"sid": sid, "message": "Email booking rejection sent successfully."}
+        else:
+            return {"message": f"{request.notification_type} notifications are not implemented yet."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/send-booking-rescheduled", status_code=status.HTTP_200_OK, response_model=MessageResponse)
 async def send_booking_rescheduled(request: MessageRequest):
-    sid = await notification_service.booking_rescheduling(request.booking_id, request.customer_id, request.to)
-    return {"sid": sid, "message": "Booking rescheduling sent successfully."}
+    try:
+        if request.notification_type == NotificationType.SMS:
+            sid = await notification_service.booking_rescheduling(request.booking_id, request.customer_id, request.to)
+            return {"sid": sid, "message": "SMS booking rescheduling sent successfully."}
+        elif request.notification_type == NotificationType.EMAIL:
+            sid = await email_service.booking_rescheduling(request.booking_id, request.customer_id, request.to)
+            return {"sid": sid, "message": "Email booking rescheduling sent successfully."}
+        else:
+            return {"message": f"{request.notification_type} notifications are not implemented yet."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/send-booking-canceled", status_code=status.HTTP_200_OK, response_model=MessageResponse)
 async def send_booking_canceled(request: MessageRequest):
-    sid = await notification_service.booking_canceled(request.booking_id, request.customer_id, request.to)
-    return {"sid": sid, "message": "Booking cancellation sent successfully."}
+    try:
+        if request.notification_type == NotificationType.SMS:
+            sid = await notification_service.booking_canceled(request.booking_id, request.customer_id, request.to)
+            return {"sid": sid, "message": "SMS booking cancellation sent successfully."}
+        elif request.notification_type == NotificationType.EMAIL:
+            sid = await email_service.booking_canceled(request.booking_id, request.customer_id, request.to)
+            return {"sid": sid, "message": "Email booking cancellation sent successfully."}
+        else:
+            return {"message": f"{request.notification_type} notifications are not implemented yet."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
