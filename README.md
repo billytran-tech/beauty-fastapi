@@ -25,8 +25,15 @@ see `requirements.txt`
 
 ## Running the Application
 
-1. From the root directory, start the FastAPI server:
+1. From the root directory, start the FastAPI server in development mode:
+   This will start the development server on `http://127.0.0.1:8000`.
     ```bash
-    uvicorn main:app --reload
+    fastapi dev
     ```
-    This will start the server on `http://127.0.0.1:8000`. The `--reload` option will enable hot reloading, allowing you to see code changes without restarting the server.
+
+2. From the root directory, start the FastAPI server in production mode:
+   This will start the production server on `http://0.0.0.0:8000`.
+
+   ```bash
+   fastapi run
+   ```
