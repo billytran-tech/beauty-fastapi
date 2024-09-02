@@ -106,14 +106,14 @@ def get_verification_service_id():
     return twilio_verification_sid
 
 
-def start_verification_process(phone_number: str, twilio_client: Client = Depends(get_twilio_client)):
+def start_verification_process(phone_number: str, twilio_client: Client):
     client = twilio_client
     verification = client.verify.v2.services(
         get_verification_service_id()).verifications.create(to=phone_number, channel="sms")
     return verification.status
 
 
-def attempt_verification(phone_number: str, code: str, twilio_client: Client = Depends(get_twilio_client)):
+def attempt_verification(phone_number: str, code: str, twilio_client: Client):
     client = twilio_client
 
     verification_check = client.verify.v2.services(
@@ -138,7 +138,7 @@ async def send_otp_for_verification(user_profile: Auth0User = Depends(auth.get_u
     phone_number_string = phone_number_object.dialing_code + \
         str(phone_number_object.phone_number)
 
-    start_verification_process(phone_number_string)
+    start_verification_process(phone_number_string, get_twilio_client())
 
     return {'message': 'OTP Sent'}
 
@@ -166,7 +166,8 @@ async def submit_otp(payload: OTP, user_profile: Auth0User = Depends(auth.get_us
     phone_number_string = phone_number_object.dialing_code + \
         str(phone_number_object.phone_number)
 
-    result = attempt_verification(phone_number_string, payload.code)
+    result = attempt_verification(
+        phone_number_string, payload.code, get_twilio_client())
     if (result == "approved"):
         updated_result = await db['users'].update_one({'user_id': user_profile.id}, {'$set': {'contact_info.phone_number.is_verified': True}})
         if updated_result.matched_count == 0:
