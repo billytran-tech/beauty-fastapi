@@ -19,6 +19,7 @@ def create_collection_index(collection, field, unique=False, sparse=False):
 
 def initiate_collections(db):
     collections = {
+        "users": db["users"],
         "usernames": db["usernames"],
         "merchants": db["merchants"],
         "customers": db["customers"],
@@ -38,6 +39,12 @@ def initiate_collections(db):
     create_collection_index(collections["bookings"], "merchant_id")
     create_collection_index(collections["bookings"], "customer_id")
     create_collection_index(collections["transactions"], "booking_id")
+
+    create_collection_index(collections["users"], [(
+        "contact_info.phone_number.dialing_code", 1), ("contact_info.phone_number.phone_number", 1)], unique=True)
+
+    create_collection_index(collections["users"], [
+                            ("user_id", 1)], unique=True)
 
 
 def connect_db_client(db_url: str = settings.DB_URL):

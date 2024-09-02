@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 from pydantic import BaseModel
-from app.routers.v0 import customer, merchant, services
+from app.routers.v0 import customer, merchant, services, users, country
 
 
 app = FastAPI(
@@ -10,9 +10,11 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
+app.include_router(users.router)
 app.include_router(customer.router)
 app.include_router(merchant.router)
 app.include_router(services.router)
+app.include_router(country.router)
 
 
 class WelcomeResponse(BaseModel):
