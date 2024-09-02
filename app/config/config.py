@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     TWILIO_TOKEN: str
     TWILIO_VERIFICATION_SID: str
 
+    SENTRY_DSN: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
 

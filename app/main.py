@@ -1,6 +1,22 @@
 from fastapi import FastAPI, status
 from pydantic import BaseModel
 from app.routers.v0 import customer, merchant, services, users, country
+import sentry_sdk
+
+from app.config.config import settings
+
+_sentry_dsn = settings.SENTRY_DSN
+
+sentry_sdk.init(
+    dsn=_sentry_dsn,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
 
 
 app = FastAPI(
