@@ -171,3 +171,4 @@ example.env
 app/routers/v0/bookings.py
 /app/services
 app/helpers/default_user_data.py
+app/helpers/example_data.py

@@ -6,12 +6,45 @@ from app.schema.object_models.v0.id_model import PyObjectId
 from app.schema.object_models.v0.location_model import Coordinates, Location
 from app.schema.object_models.v0.settings_model import ProfileSettings
 from app.schema.object_models.v0.schedule_model import Schedule
+from app.schema.object_models.v0.contact_model import ContactInfo
+from app.schema.object_models.v0.country_model import FullCountryModel
 
 
 class WishList(BaseModel):
     name: str
     stylists: List[str]
     services: List[str]
+
+
+class RegisterUser(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias='_id')
+    first_name: str
+    last_name: str
+    country_code: str
+    phone_number: int
+    model_config = ConfigDict(populate_by_name=True,
+                              arbitrary_types_allowed=True, json_encoders={ObjectId: str})
+
+
+class UserProfile(BaseModel):
+    id: str = Field(alias='_id')
+    user_id: str
+    first_name: str
+    last_name: str
+    country_code: str
+    contact_info: ContactInfo
+    model_config = ConfigDict(populate_by_name=True,
+                              arbitrary_types_allowed=True)
+
+
+class UserProfileResponse(BaseModel):
+    first_name: str
+    last_name: str
+    country: FullCountryModel
+    # contact_info: ContactInfo
+
+    model_config = ConfigDict(populate_by_name=True,
+                              arbitrary_types_allowed=True)
 
 
 class User(BaseModel):
@@ -233,4 +266,5 @@ class MerchantBasicInfo(BaseModel):
     username: str
     profession: str
     bio: Optional[str] = None
-    model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
+    model_config = ConfigDict(populate_by_name=True,
+                              arbitrary_types_allowed=True)
