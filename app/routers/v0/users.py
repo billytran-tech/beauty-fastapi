@@ -106,14 +106,14 @@ def get_verification_service_id():
     return twilio_verification_sid
 
 
-def start_verification_process(phone_number: str, twilio_client: Client):
+def start_verification_process(phone_number: str, twilio_client: Client = Depends(get_twilio_client)):
     client = twilio_client
     verification = client.verify.v2.services(
         get_verification_service_id()).verifications.create(to=phone_number, channel="sms")
     return verification.status
 
 
-def attempt_verification(phone_number: str, code: str, twilio_client: Client):
+def attempt_verification(phone_number: str, code: str, twilio_client: Client = Depends(get_twilio_client)):
     client = twilio_client
 
     verification_check = client.verify.v2.services(
