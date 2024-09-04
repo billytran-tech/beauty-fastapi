@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 from pydantic import BaseModel
-from app.routers.v0 import customer, merchant, services, users, country, username
+from app.routers.v0 import customer, merchant, services, users, country, username, uploads
 import sentry_sdk
 
 from app.config.config import settings
@@ -32,6 +32,7 @@ app.include_router(merchant.router)
 app.include_router(services.router)
 app.include_router(username.router)
 app.include_router(country.router)
+app.include_router(uploads.router)
 
 
 class WelcomeResponse(BaseModel):
