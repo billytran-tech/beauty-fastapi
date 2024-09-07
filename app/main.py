@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from app.notification_service import NotificationService, NotificationType
 from app.email_service import EmailService  # Import the EmailService
+from app.whatsapp_service import WhatsAppService  # Import the WhatsAppService
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -17,6 +19,7 @@ app = FastAPI(
 )
 
 notification_service = NotificationService()
+whatsapp_service = WhatsAppService()
 email_service = EmailService()
 
 class MessageRequest(BaseModel):
@@ -109,5 +112,21 @@ async def send_booking_canceled(request: MessageRequest):
             return {"sid": sid, "message": "Email booking cancellation sent successfully."}
         else:
             return {"message": f"{request.notification_type} notifications are not implemented yet."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/send-whatsapp-notification", status_code=status.HTTP_200_OK, response_model=MessageResponse)
+async def send_whatsapp_notification(request: MessageRequest):
+    try:
+        sid = await whatsapp_service.send_notification(request.booking_id, request.customer_id, request.to, request.update_text or "New WhatsApp message.")
+        return {"sid": sid, "message": "WhatsApp notification sent successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/send-whatsapp-reminder", status_code=status.HTTP_200_OK, response_model=MessageResponse)
+async def send_whatsapp_reminder(request: MessageRequest):
+    try:
+        sid = await whatsapp_service.send_notification(request.booking_id, request.customer_id, request.to, "This is a reminder for your booking.")
+        return {"sid": sid, "message": "WhatsApp booking reminder sent successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
