@@ -1,6 +1,7 @@
 import logging
 from datetime import time
-from fastapi import APIRouter, status, Depends, HTTPException, Security
+from typing import Annotated, List
+from fastapi import APIRouter, Query, status, Depends, HTTPException, Security
 from fastapi.encoders import jsonable_encoder
 from pydantic import ConfigDict, BaseModel, Field
 import pymongo
@@ -33,6 +34,48 @@ class CreateUserName(BaseModel):
     user_auth0_id: str
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
+
+
+@router.get('/', status_code=status.HTTP_200_OK, response_model=List[user_model.MerchantCardResponse])
+async def get_merchants(
+    page: Annotated[int, Query(description="Page Number")] = 1,
+    per_page: Annotated[int, Query(
+        description="Number of items per page")] = 10,
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    if page < 1 or per_page < 1:
+        raise HTTPException(
+            status_code=400, detail="Invalid page or per_page values")
+
+    # Calculate the number of documents to skip
+    skip = (page - 1) * per_page
+
+    # QueryMongoDB using skip and limit
+    try:
+        merchants = await db['merchants'].find().skip(skip).limit(per_page).to_list(length=None)
+        # users = jsonable_encoder(users)
+        # return users
+        # print(users)
+        merchant_profiles = []
+        for merchant in merchants:
+
+            username = await db['usernames'].find_one({'_id': merchant.get('username_id')})
+            merchantCardData = {
+                'username': username.get('username'),
+                'image_url': merchant.get('profile_image_url'),
+                'header_name': merchant.get('name'),
+                'location': merchant.get('location'),
+                'profession': merchant.get('profession'),
+            }
+            user_model.MerchantCardResponse.model_validate(
+                merchantCardData)
+            merchant_profiles.append(merchantCardData)
+
+        return merchant_profiles
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"{e}")
 
 
 @router.get('/get-my-profile', status_code=status.HTTP_200_OK, dependencies=[Depends(auth.implicit_scheme)], response_model=user_model.MerchantProfileData)
