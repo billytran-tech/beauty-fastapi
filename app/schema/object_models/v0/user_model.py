@@ -4,6 +4,7 @@ from pydantic import ConfigDict, BaseModel, Field, AnyHttpUrl
 from typing import List, Optional
 from app.schema.object_models.v0.id_model import PyObjectId
 from app.schema.object_models.v0.location_model import Coordinates, Location
+from app.schema.object_models.v0.service_model import ServiceSnapshotResponse
 from app.schema.object_models.v0.settings_model import ProfileSettings
 from app.schema.object_models.v0.schedule_model import Schedule
 from app.schema.object_models.v0.contact_model import ContactInfo
@@ -257,6 +258,7 @@ class MerchantQueryResponseData(BaseModel):
     name: str
     # contact_info: Contact
     profile: MerchantDataWithoutSchedule
+    services: List[ServiceSnapshotResponse]
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
 

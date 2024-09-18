@@ -63,7 +63,7 @@ class ServiceOwner(BaseModel):
 class ServiceSnapshotResponse(BaseModel):
     id: str = Field(alias="_id")
     service_name: str = Field(...)
-    duration: int = Field(...)
+    duration_minutes: int = Field(...)
     out_call: bool = Field(...)
     images: Optional[List[str]] = None
     price: Price = Field(...)

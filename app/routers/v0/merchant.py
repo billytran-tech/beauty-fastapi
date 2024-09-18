@@ -9,7 +9,7 @@ from pymongo.errors import PyMongoError
 
 from app.config.config import settings
 from app.helpers.default_user_data import get_default_notification_settings, get_default_schedule
-from app.schema.object_models.v0 import user_model
+from app.schema.object_models.v0 import user_model, service_model
 from app.schema.object_models.v0.id_model import PyObjectId
 from app.config.database.database import get_db, get_db_client, get_db_name
 from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorClient
@@ -61,6 +61,74 @@ async def get_my_profile(user_profile: Auth0User = Depends(auth.get_user), db: A
         # Handle MongoDB related errors
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.get('/username/{username}', response_model=user_model.MerchantQueryResponseData)
+async def get_merchant_by_username(username: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+    # Use an aggregation pipeline to perform the entire operation in one query
+    pipeline = [
+        {
+            "$match": {"username": username}
+        },
+        {
+            "$lookup": {
+                "from": "merchants",
+                "localField": "user_id",
+                "foreignField": "user_id",
+                "as": "user_profile"
+            }
+        },
+        {
+            "$unwind": "$user_profile"
+        },
+        {
+            "$lookup": {
+                "from": "services",
+                "localField": "user_id",
+                "foreignField": "owner_id",
+                "as": "user_profile.services"
+            }
+        },
+    ]
+
+    try:
+        result = await db['usernames'].aggregate(pipeline).to_list(1)
+        # username = await collections['usernames'].find_one({'username':username.lower()})
+        # return username
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Username not found")
+        if not result[0].get('user_profile'):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Merchant profile not found.")
+        # return result
+        services_list = []
+        services = result[0].get('user_profile').get('services')
+        for service in services:
+            # service = jsonable_encoder(service)
+            services_list.append(
+                service_model.ServiceSnapshotResponse.model_validate(service))
+            # print(merchant_models.Service(**service))
+        # return services_list
+        # profiles = result[0].get('user_profile').get('profiles')
+        # return profiles
+        # merchant_profile = None
+        response = {
+            'username': result[0].get('username'),
+            'name': result[0].get('user_profile').get('name'),
+            'profile': result[0].get('user_profile'),
+            'services': services_list
+        }
+
+        # merchant_profile = profile
+
+        # return merchant_profile
+        # print(res)
+        return response
+
+    except Exception as e:
+        raise e
+    # HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"{e}")
 
 
 @router.post('/create', status_code=status.HTTP_201_CREATED, dependencies=[Depends(auth.implicit_scheme)], response_model=user_model.MerchantProfileData)
