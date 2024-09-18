@@ -38,7 +38,7 @@ class ProfileServiceResponse(BaseModel):
 class Service(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     service_name: str = Field(...)
-    duration: int = Field(...)
+    duration_minutes: int = Field(...)
     out_call: bool = Field(...)
     description: str = Field(...)
     images: Optional[List[str]] = None

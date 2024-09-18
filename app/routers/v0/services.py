@@ -42,6 +42,15 @@ async def create_service(payload: service_model.CreateService, user_profile: Aut
     return jsonable_encoder(created_service)
 
 
+@router.get('/', response_model=List[service_model.ServiceResponse])
+async def get_all_services(db: AsyncIOMotorDatabase = Depends(get_db)):
+    services = await db['services'].find().to_list(length=None)
+    for service in services:
+        service['owner'] = await get_owner_details(service.get('owner_id'), db)
+
+    return services
+
+
 @router.get("/get_my_services", status_code=status.HTTP_200_OK, response_model=List[service_model.ProfileServiceResponse])
 async def get_my_services(user_profile: Auth0User = Depends(auth.get_user), db: AsyncIOMotorDatabase = Depends(get_db)):
     services = await db['services'].find({"owner_id": user_profile.id}).to_list(length=None)
