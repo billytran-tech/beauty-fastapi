@@ -11,7 +11,7 @@ from app.config.database.database import get_db
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.helpers.country_data import get_country
 from app.schema.object_models.v0.user_model import RegisterUser, UserProfile, UserProfileResponse
-from app.schema.object_models.v0.contact_model import ContactInfo
+from app.schema.object_models.v0.contact_model import ContactInfo, UpdatePhoneNumber, PhoneNumber
 from app.schema.object_models.v0.country_model import FullCountryModel
 
 router = APIRouter(
@@ -179,3 +179,47 @@ async def submit_otp(payload: OTP, user_profile: Auth0User = Depends(auth.get_us
         return {'message': 'Verification Successful'}
     else:
         return {'message': 'Verification Not Succesful'}
+
+
+@router.put('/update/phone-number')
+async def update_phone_number(payload: UpdatePhoneNumber, user_profile: Auth0User = Depends(auth.get_user), db: AsyncIOMotorDatabase = Depends(get_db)):
+    user = await db['users'].find_one({'user_id': user_profile.id})
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='User Not Found.')
+
+    user = UserProfile.model_validate(user)
+    verification_status = user.contact_info.phone_number.is_verified
+    if (verification_status):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail='Phone Number is Already Verified. Cannot Update.')
+
+    country = get_country(user.country_code)
+
+    if not country:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid Country Code')
+    country = FullCountryModel.model_validate(country)
+
+    phone_number = {
+        'dialing_code': country.dialing_code,
+        'phone_number': payload.phone_number,
+        'is_verified': False
+    }
+
+    updated_result = await db['users'].update_one({'user_id': user_profile.id}, {'$set': {'contact_info.phone_number': phone_number}})
+    if updated_result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND)
+    if updated_result.modified_count == 0:
+        raise HTTPException(status_code=status.HTTP_304_NOT_MODIFIED)
+    phone_number = PhoneNumber.model_validate(phone_number)
+
+    phone_number_string = phone_number.dialing_code + \
+        str(phone_number.phone_number)
+
+    start_verification_process(phone_number_string, get_twilio_client())
+
+    return {
+        'message': 'Phone Number Updated Successfully. Verification Code Sent'
+    }
