@@ -2,33 +2,30 @@ from typing import Optional
 from pydantic import ConfigDict, BaseModel
 
 
-class Currency(BaseModel):
-    code: str
-    symbol: str
-    name: str
+class Email(BaseModel):
+    email: str
+    is_verified: bool = False
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
 
 
-class Country(BaseModel):
-    name: str
-    code: str
-    dialing_code: str = None
-    currency: Currency
+class UpdatePhoneNumber(BaseModel):
+    phone_number: str
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
 
 
-class FullCountryModel(Country):
+class PhoneNumber(BaseModel):
     dialing_code: str
-
+    phone_number: int
+    is_verified: bool = False
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
 
 
-class CountrySummary(BaseModel):
-    value: str
-    code: str
-    label: str
+class ContactInfo(BaseModel):
+    email: Optional[Email] = None
+    phone_number: PhoneNumber
+
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
