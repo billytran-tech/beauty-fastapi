@@ -33,7 +33,7 @@ app.include_router(services.router)
 app.include_router(username.router)
 app.include_router(country.router)
 app.include_router(uploads.router)
-app.include_router(uploads.router)
+app.include_router(file_uploads.router)
 
 
 class WelcomeResponse(BaseModel):
