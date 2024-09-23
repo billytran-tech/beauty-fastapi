@@ -1,4 +1,4 @@
-from datetime import time, date
+from datetime import time, datetime
 from pydantic import ConfigDict, BaseModel
 from typing import List
 
@@ -31,8 +31,8 @@ class DailySchedule(BaseModel):
 
 
 class BlockedDate(BaseModel):
-    start: date
-    end: date
+    start: datetime
+    end: datetime
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
 
