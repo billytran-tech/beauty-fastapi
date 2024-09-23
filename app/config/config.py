@@ -18,6 +18,11 @@ class Settings(BaseSettings):
 
     SENTRY_DSN: str
 
+    AWS_BUCKET_REGION: str
+    AWS_BUCKET_NAME: str
+    AWS_ACCESS_KEY: str
+    AWS_SECRET_ACCESS_KEY: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
 

@@ -7,6 +7,8 @@ anyio==4.4.0
 attrs==24.2.0
 azure-core==1.30.2
 azure-storage-blob==12.22.0
+boto3==1.35.24
+botocore==1.35.24
 certifi==2024.7.4
 cffi==1.17.0
 charset-normalizer==3.3.2
@@ -26,6 +28,7 @@ idna==3.7
 iniconfig==2.0.0
 isodate==0.6.1
 Jinja2==3.1.4
+jmespath==1.0.1
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 mdurl==0.1.2
@@ -52,6 +55,7 @@ PyYAML==6.0.1
 requests==2.32.3
 rich==13.7.1
 rsa==4.9
+s3transfer==0.10.2
 sentry-sdk==2.13.0
 shellingham==1.5.4
 six==1.16.0
