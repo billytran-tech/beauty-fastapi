@@ -30,8 +30,15 @@ class DailySchedule(BaseModel):
                               arbitrary_types_allowed=True)
 
 
+class BlockedDate(BaseModel):
+    start: date
+    end: date
+    model_config = ConfigDict(populate_by_name=True,
+                              arbitrary_types_allowed=True)
+
+
 class Schedule(BaseModel):
     daily_schedule: DailySchedule
-    blocked_dates: List[date]
+    blocked_dates: List[BlockedDate]
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
