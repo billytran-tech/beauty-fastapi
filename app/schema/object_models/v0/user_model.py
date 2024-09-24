@@ -81,7 +81,7 @@ class CreateCustomer(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias='_id')
     name: str
     country: str
-    profile_image_url: Optional[AnyHttpUrl] = None
+    profile_picture_url: Optional[AnyHttpUrl] = None
     wishlists: Optional[List[WishList]] = None
     # TODO[pydantic]: The following keys were removed: `json_encoders`.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
@@ -94,7 +94,7 @@ class InsertDBCustomer(BaseModel):
     user_id: str
     name: str
     country: str
-    profile_image_url: Optional[AnyHttpUrl] = None
+    profile_picture_url: Optional[AnyHttpUrl] = None
     wishlists: Optional[List[WishList]] = None
     settings: ProfileSettings
     model_config = ConfigDict(populate_by_name=True,
@@ -208,7 +208,7 @@ class MerchantDBStructure(BaseModel):
     user_id: str
     name: str
     profession: str
-    profile_image_url: Optional[str] = None
+    profile_picture_url: Optional[str] = None
     intro_video_url: Optional[str] = None
     schedule: Schedule
     location: Location
@@ -249,7 +249,7 @@ class MerchantDataWithoutSchedule(BaseModel):
     name: str
     profession: Optional[str] = None
     location: Location
-    profile_image_url: Optional[AnyHttpUrl] = None
+    profile_picture_url: Optional[AnyHttpUrl] = None
     intro_video_url: Optional[AnyHttpUrl] = None
     bio: Optional[str] = None
     model_config = ConfigDict(populate_by_name=True,
