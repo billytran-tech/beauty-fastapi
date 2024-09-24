@@ -276,12 +276,12 @@ class MerchantBasicInfo(BaseModel):
 
 
 class UpdateIntroVideoURL(BaseModel):
-    intro_video_url: AnyHttpUrl
+    intro_video_url: str
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
 
 
 class UpdateProfilePictureURL(BaseModel):
-    profile_picture_url: AnyHttpUrl
+    profile_picture_url: str
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
