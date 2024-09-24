@@ -1,4 +1,5 @@
 from fastapi import FastAPI, status
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from app.routers.v0 import customer, merchant, services, users, country, username, uploads, file_uploads
 import sentry_sdk
@@ -34,6 +35,20 @@ app.include_router(username.router)
 app.include_router(country.router)
 app.include_router(uploads.router)
 app.include_router(file_uploads.router)
+
+origins = [
+    "https://www.suavbeauty.com",
+    "https://suav-business-app.vercel.app",
+    "https://business.suavbeauty.com",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class WelcomeResponse(BaseModel):
