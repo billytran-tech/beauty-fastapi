@@ -181,6 +181,7 @@ class MerchantProfileData(BaseModel):
     profession: Optional[str] = None
     location: Location | None = None
     profile_image_url: Optional[AnyHttpUrl] = None
+    intro_video_url: Optional[AnyHttpUrl] = None
     schedule: Schedule
     bio: Optional[str] = None
     settings: ProfileSettings
@@ -208,6 +209,7 @@ class MerchantDBStructure(BaseModel):
     name: str
     profession: str
     profile_image_url: Optional[str] = None
+    intro_video_url: Optional[str] = None
     schedule: Schedule
     location: Location
     bio: Optional[str] = None
@@ -248,6 +250,7 @@ class MerchantDataWithoutSchedule(BaseModel):
     profession: Optional[str] = None
     location: Location
     profile_image_url: Optional[AnyHttpUrl] = None
+    intro_video_url: Optional[AnyHttpUrl] = None
     bio: Optional[str] = None
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
@@ -268,5 +271,17 @@ class MerchantBasicInfo(BaseModel):
     username: str
     profession: str
     bio: Optional[str] = None
+    model_config = ConfigDict(populate_by_name=True,
+                              arbitrary_types_allowed=True)
+
+
+class UpdateIntroVideoURL(BaseModel):
+    intro_video_url: AnyHttpUrl
+    model_config = ConfigDict(populate_by_name=True,
+                              arbitrary_types_allowed=True)
+
+
+class UpdateProfilePictureURL(BaseModel):
+    profile_picture_url: AnyHttpUrl
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)

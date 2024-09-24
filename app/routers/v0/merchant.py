@@ -514,6 +514,68 @@ async def delete_merchant_profile(user_profile: Auth0User = Depends(auth.get_use
                             detail=str(e))
 
 
+@router.put('/update/intro-video-url', status_code=status.HTTP_200_OK, dependencies=[Depends(auth.implicit_scheme)], response_model=user_model.MerchantProfileData)
+async def update_intro_video_url(payload: user_model.UpdateIntroVideoURL, user_profile: Auth0User = Security(auth.get_user), db: AsyncIOMotorDatabase = Depends(get_db)):
+    user_id = user_profile.id
+    try:
+        merchant = await db['merchants'].find_one({'user_id': user_id})
+        if not merchant:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Merchant profile does not exist. Please create one.")
+
+        updated_user = await db['merchants'].update_one({'user_id': user_id}, {"$set": {"intro_video_url": payload.intro_video_url}})
+
+        if updated_user.matched_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
+        if updated_user.modified_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_304_NOT_MODIFIED, detail="Profile data not updated")
+
+        if (merchant := await db['merchants'].find_one({'user_id': user_id})) is not None:
+            merchant = jsonable_encoder(merchant)
+            merchant_username_id = merchant['username_id']
+            username = await db['usernames'].find_one({"_id": merchant_username_id})
+            username = jsonable_encoder(username)
+            merchant['username'] = username['username']
+            return merchant
+
+    except Exception as e:
+        raise e
+
+
+@router.put('/update/profile-picture-url', status_code=status.HTTP_200_OK, dependencies=[Depends(auth.implicit_scheme)], response_model=user_model.MerchantProfileData)
+async def update_profile_picture_url(payload: user_model.UpdateProfilePictureURL, user_profile: Auth0User = Security(auth.get_user), db: AsyncIOMotorDatabase = Depends(get_db)):
+    user_id = user_profile.id
+    try:
+        merchant = await db['merchants'].find_one({'user_id': user_id})
+        if not merchant:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Merchant profile does not exist. Please create one.")
+
+        updated_user = await db['merchants'].update_one({'user_id': user_id}, {"$set": {"profile_picture_url": payload.profile_picture_url}})
+
+        if updated_user.matched_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
+        if updated_user.modified_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_304_NOT_MODIFIED, detail="Profile data not updated")
+
+        if (merchant := await db['merchants'].find_one({'user_id': user_id})) is not None:
+            merchant = jsonable_encoder(merchant)
+            merchant_username_id = merchant['username_id']
+            username = await db['usernames'].find_one({"_id": merchant_username_id})
+            username = jsonable_encoder(username)
+            merchant['username'] = username['username']
+            return merchant
+
+    except Exception as e:
+        raise e
+
+
 # ================= STILL NEEDED ================= #
 
 # UPDATE AVAILABILITY SCHEDULE
