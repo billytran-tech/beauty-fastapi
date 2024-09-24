@@ -112,7 +112,7 @@ class UpdateCustomerData(BaseModel):
 class CustomerDataResponse(BaseModel):
     name: str
     country: str
-    profile_image_url: Optional[AnyHttpUrl] = None
+    profile_picture_url: Optional[AnyHttpUrl] = None
     wishlists: Optional[List[WishList]] = None
     settings: ProfileSettings
     model_config = ConfigDict(populate_by_name=True,
@@ -180,7 +180,7 @@ class MerchantProfileData(BaseModel):
     username: str
     profession: Optional[str] = None
     location: Location | None = None
-    profile_image_url: Optional[AnyHttpUrl] = None
+    profile_picture_url: Optional[AnyHttpUrl] = None
     intro_video_url: Optional[AnyHttpUrl] = None
     schedule: Schedule
     bio: Optional[str] = None

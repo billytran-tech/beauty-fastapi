@@ -62,7 +62,7 @@ async def upload_profile_image(user_profile: Auth0User = Security(auth.get_user)
 
         image_url = f"https://{blob_service_client.account_name}.blob.core.windows.net/{container_name}/{file_name}"
         # print(image_url)
-        updated_account = await db['merchants'].update_one({'user_id': user_profile.id}, {'$set': {'profile_image_url': image_url}})
+        updated_account = await db['merchants'].update_one({'user_id': user_profile.id}, {'$set': {'profile_picture_url': image_url}})
 
         if updated_account.modified_count == 0:
             raise HTTPException(

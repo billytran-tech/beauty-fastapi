@@ -62,7 +62,7 @@ async def get_merchants(
             username = await db['usernames'].find_one({'_id': merchant.get('username_id')})
             merchantCardData = {
                 'username': username.get('username'),
-                'image_url': merchant.get('profile_image_url'),
+                'image_url': merchant.get('profile_picture_url'),
                 'header_name': merchant.get('name'),
                 'location': merchant.get('location'),
                 'profession': merchant.get('profession'),
