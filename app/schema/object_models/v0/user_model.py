@@ -179,7 +179,7 @@ class MerchantProfileData(BaseModel):
     name: str | None = None
     username: str
     profession: Optional[str] = None
-    location: Location | None = None
+    location: Location = None
     profile_picture_url: Optional[AnyHttpUrl] = None
     intro_video_url: Optional[AnyHttpUrl] = None
     schedule: Schedule
