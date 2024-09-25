@@ -49,7 +49,18 @@ _country_objects = {
             'symbol': '₴',
             'name': 'Ukranian hryvnia'
         }
+    },
+    'PK': {
+        'name': 'Pakistan',
+        'code': 'PK',
+        'dialing_code': '+92',
+        'currency': {
+            'code': 'PKR',
+            'symbol': '₨',
+            'name': 'Pakistani Rupee'
+        }
     }
+
 }
 
 
