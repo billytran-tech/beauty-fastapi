@@ -36,10 +36,20 @@ _country_objects = {
         'dialing_code': '+91',
                 'currency': {
                     'code': 'INR',
-                        'symbol': 'Rs',
+                        'symbol': '₹',
                         'name': 'Indian Rupee',
                 },
     },
+    'UA': {
+        'name': 'Ukraine',
+        'code': 'UA',
+        'dialing_code': '+380',
+        'currency': {
+            'code': 'UAH',
+            'symbol': '₴',
+            'name': 'Ukranian hryvnia'
+        }
+    }
 }
 
 
