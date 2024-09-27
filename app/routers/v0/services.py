@@ -136,7 +136,7 @@ def format_service_results(results):
         transformed_item = {
             "_id": item.get("_id", ""),
             "service_name": item.get("service_name", ""),
-            "duration": item.get("duration", ""),
+            "duration_minutes": item.get("duration_minutes", ""),
             "out_call": item.get("out_call", ""),
             "description": item.get("description", ""),
             "customisation": item.get("customisation", ""),
