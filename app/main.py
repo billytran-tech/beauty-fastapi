@@ -2,6 +2,7 @@ from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from app.routers.v0 import customer, merchant, services, users, country, username, uploads, file_uploads
+from app.routers.v0.payments import stripe
 import sentry_sdk
 
 from app.config.config import settings
@@ -35,6 +36,7 @@ app.include_router(username.router)
 app.include_router(country.router)
 app.include_router(uploads.router)
 app.include_router(file_uploads.router)
+app.include_router(stripe.router)
 
 origins = [
     "https://www.suavbeauty.com",
