@@ -168,7 +168,7 @@ example-test.env
 example.env
 
 # tests
-app/routers/v0/bookings.py
+# app/routers/v0/bookings.py
 app/helpers/default_user_data.py
 app/helpers/example_data.py
 app/services/payments/stripe.py
