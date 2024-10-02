@@ -1,5 +1,4 @@
 import datetime as super_datetime
-from app.helpers.example_data import get_example_booking,  get_example_schedule
 from app.schema.object_models.v0.schedule_model import Schedule
 from datetime import datetime, timedelta
 from typing import Annotated, List
