@@ -29,7 +29,10 @@ async def authorize_user(user_profile: Auth0User = Depends(auth.get_user), db: A
     user_id = user_profile.id
     merchant = await db['merchants'].find_one({'user_id': user_id})
 
-    return merchant.get('payments_account').get('account_id')
+    if (merchant.get('payments_account')):
+        return merchant.get('payments_account').get('account_id')
+
+    return
 
 
 @router.put('/update/account/id')
