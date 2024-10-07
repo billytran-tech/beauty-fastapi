@@ -200,12 +200,20 @@ async def create_new_booking(payload: booking_model.CreateBooking, user_profile:
     user_id = user_profile.id
     # return payload
     customer = await db['customers'].find_one({'user_id': user_id})
-    if not customer:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail='Customer Account Not Active.')
 
-    customer_info = booking_model.ClientObject.model_validate(customer)
-    # return customer_info
+    customer_info = ''
+
+    if customer:
+        customer_info = booking_model.ClientObject.model_validate(customer)
+    else:
+        customer_info = {
+            'id': user_profile.id,
+            'name': user_profile.email,
+            'profile_image_url': None
+
+        }
+        customer_info = booking_model.ClientObject.model_validate(
+            customer_info)
 
     service = await db['services'].find_one({'_id': payload.service_id})
     service = service_model.ServiceDBObject.model_validate(service)
