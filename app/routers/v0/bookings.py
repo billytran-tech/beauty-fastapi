@@ -209,7 +209,7 @@ async def create_new_booking(payload: booking_model.CreateBooking, user_profile:
         customer_info = {
             'id': user_profile.id,
             'name': user_profile.email,
-            'profile_image_url': None,
+            'profile_picture_url': None,
             'user_id': user_profile.id
 
         }

@@ -34,7 +34,7 @@ class CreateBooking(BaseModel):
 class ClientObject(BaseModel):
     id: str = Field(alias='user_id')
     name: str
-    profile_image_url: Optional[str] = None
+    profile_picture_url: Optional[str] = None
     # contact_info: Contact
 
     class Config:
@@ -44,7 +44,7 @@ class ClientObject(BaseModel):
 
 class MerchantObject(BaseModel):
     id: str = Field(alias='_id')
-    profile_image_url: AnyHttpUrl | None
+    profile_picture_url: Optional[str] = None
     name: str
 
     class Config:
