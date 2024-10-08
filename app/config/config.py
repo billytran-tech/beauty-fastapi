@@ -25,6 +25,7 @@ class Settings(BaseSettings):
 
     STRIPE_SECRET_KEY: str
     STRIPE_WEBHOOK_SECRET: str
+    PAYMENT_RETURN_URL: str
 
     model_config = SettingsConfigDict(env_file=".env")
 

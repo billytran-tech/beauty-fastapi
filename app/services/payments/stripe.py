@@ -8,6 +8,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.schema.object_models.v0 import booking_model
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+payment_return_url = settings.PAYMENT_RETURN_URL
 
 
 class PaymentsAccount(BaseModel):
@@ -137,7 +138,7 @@ def create_checkout_session(booking: booking_model.BookingFullModel, email: str)
             customer_email=email,
             line_items=get_line_items(booking),
             mode='payment',
-            return_url='http://localhost:3000/payment/return?session_id={CHECKOUT_SESSION_ID}',
+            return_url=payment_return_url,
             metadata={
                 'booking_id': booking.id
             },
