@@ -3,7 +3,9 @@ from pydantic import BaseModel, ConfigDict
 from app.config.config import settings
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.auth.auth import Auth0, Auth0User
+from app.schema.object_models.v0 import booking_model
 from app.config.database.database import get_db
+from app.services.payments.stripe import create_checkout_session, get_checkout_session_status
 # from app.services.payments.stripe import get_stripe_account_id
 
 router = APIRouter(
@@ -22,6 +24,11 @@ class PaymentsAccount(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True,
                               arbitrary_types_allowed=True)
+
+
+@router.get('/session_status/{session_id}')
+def get_session_status(session_id: str):
+    return get_checkout_session_status(session_id)
 
 
 @router.get('/account/id')
@@ -56,3 +63,13 @@ async def set_merchant_stripe_account_id(payload: PaymentsAccount, user_profile:
         raise HTTPException(status_code=status.HTTP_304_NOT_MODIFIED)
 
     return {'message': 'Account updated successfully'}
+
+
+@router.get('/checkout_session/{booking_id}')
+async def get_checkout_session(booking_id: str, user_profile: Auth0User = Depends(auth.get_user), db: AsyncIOMotorDatabase = Depends(get_db)):
+    booking = await db['bookings'].find_one({'_id': booking_id})
+    booking = booking_model.BookingFullModel.model_validate(booking)
+    client_secret = create_checkout_session(booking, user_profile.email)
+    return {
+        'client_secret': client_secret
+    }

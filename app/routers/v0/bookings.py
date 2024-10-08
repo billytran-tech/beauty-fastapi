@@ -11,6 +11,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorClient
 from app.schema.enums.enums import BookingStatusEnum, PaymentStatusEnum
 from app.config.config import settings
 from app.auth.auth import Auth0, Auth0User
+from app.services.payments.stripe import create_checkout_session
 
 router = APIRouter(
     prefix="/api/bookings",
@@ -75,12 +76,10 @@ def calculate_possible_start_times(schedule: Schedule, appointment_duration_minu
                     booking = booking_model.BookingFullModel.model_validate(
                         booking)
                     if (booking.booking_status == BookingStatusEnum.CANCELLED):
-                        # Ignore cancelled booking
+
                         continue
                     appt_start = booking.appointment_date.start_time
                     appt_end = booking.appointment_date.end_time
-                    print(f'Current Time: {current_time}')
-                    print(f'a')
                     if (current_time < appt_end and (current_time + appointment_duration) > appt_start):
                         overlap = True
                 if not overlap:
@@ -119,6 +118,7 @@ async def get_availability_for_next_7_days(username: str, starting_date: date, d
     # return bookings
     available_slots = calculate_possible_start_times(
         schedule, duration_minutes, starting_date, bookings)
+    print(available_slots)
     return available_slots
 
 
@@ -254,7 +254,13 @@ async def create_new_booking(payload: booking_model.CreateBooking, user_profile:
     booking = await db['bookings'].insert_one(booking_info)
 
     new_booking = await db['bookings'].find_one({'_id': booking.inserted_id})
-    return new_booking
+    new_booking = booking_model.BookingFullModel.model_validate(new_booking)
+    checkout_client_secret = create_checkout_session(
+        new_booking, user_profile.email)
+    return {
+        'new_booking': new_booking,
+        'client_secret': checkout_client_secret
+    }
 
 
 # REQUEST RESCHEDULE (POST)
