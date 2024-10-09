@@ -118,7 +118,6 @@ async def get_availability_for_next_7_days(username: str, starting_date: date, d
     # return bookings
     available_slots = calculate_possible_start_times(
         schedule, duration_minutes, starting_date, bookings)
-    print(available_slots)
     return available_slots
 
 
