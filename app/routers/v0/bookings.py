@@ -159,7 +159,10 @@ async def get_my_bookings_as_merchant(
     skip = (page - 1) * per_page
 
     # Query MongoDB using skip and limit
-    bookings = await db['bookings'].find({"merchant.id": user_id}).skip(skip).limit(per_page).to_list(length=None)
+    merchant = await db['merchants'].find_one({'user_id': user_id})
+    merchant = user_model.MerchantModelForComparison.model_validate(merchant)
+
+    bookings = await db['bookings'].find({"merchant.id": merchant.id}).skip(skip).limit(per_page).to_list(length=None)
 
     return bookings
 
